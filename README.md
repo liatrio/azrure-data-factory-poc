@@ -39,9 +39,9 @@ environment based branches. Both Deployment jobs in yaml and classic Release Pip
 
 ## Contributors
 
-Eric Chapman, Principal DevOps Engineer 
-Ryan Vance, Sr. DevOps Engineer 
-[Justin Bankes](https://github.com/jbankes), Sr. DevOps Engineer 
-Michael Parker, Sr. DevOps Engineer 
+Eric Chapman, Principal DevOps Engineer  
+Ryan Vance, Sr. DevOps Engineer  
+[Justin Bankes](https://github.com/jbankes), Sr. DevOps Engineer  
+Michael Parker, Sr. DevOps Engineer  
 
 [Liatrio](https://www.liatrio.com)
