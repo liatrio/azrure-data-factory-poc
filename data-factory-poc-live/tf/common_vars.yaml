@@ -1,0 +1,5 @@
+source_ref: "<<TODO: git source refrence to point to for data-factory-poc-modules>>"
+
+tenant_id: "<<TODO: tenant id for azure resources>>"
+resource_group: "data-factory-poc"
+pipeline_sp_id: "<<TODO: Service principal id for pipeline>>"

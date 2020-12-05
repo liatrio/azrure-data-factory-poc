@@ -1,0 +1,19 @@
+stages:
+  - stage: validate
+    displayName: Validate All ENV Terragrunt Config
+    jobs:
+      - template: pipeline_templates/validate-terragrunt.yaml
+        parameters:
+          environment: sandbox
+      - template: pipeline_templates/validate-terragrunt.yaml
+        parameters:
+          environment: nonprod
+
+  - template: pipeline_templates/apply-terragrunt.yaml
+    parameters:
+      environment: sandbox
+      next_environment: nonprod
+
+  - template: pipeline_templates/apply-terragrunt.yaml
+    parameters:
+      environment: nonprod

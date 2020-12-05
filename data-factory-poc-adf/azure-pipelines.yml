@@ -1,0 +1,23 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- nonprod
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'nonprod_azure-data-poc'
+    subscriptionId: '<<TODO: Subscription Id>>'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: 'adf_nonprod'
+    location: 'Central US'
+    templateLocation: 'Linked artifact'
+    csmFile: '$(System.DefaultWorkingDirectory)/ldatafactorypocsa/ARMTemplateParametersForFactory.json'
+    deploymentMode: 'Incremental'

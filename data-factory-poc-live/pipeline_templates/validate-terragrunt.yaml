@@ -1,0 +1,24 @@
+parameters:
+  - name: environment
+    type: string
+
+jobs:
+  - job: validate_${{ parameters.environment}}
+    displayName: Validate ${{ parameters.environment }}
+    container: 'liatrio/az-go-tf-tg:0.0.1'
+    variables:
+      - group: data_factory_poc_spn
+    steps:
+      - bash: |
+          set -euo pipefail
+
+          git config --global http.https://dev.azure.com.extraHeader "Authorization: bearer $(System.AccessToken)"
+
+          cd tf/${{ parameters.environment }}
+          terragrunt validate-all
+        displayName: Terragrunt Validate ${{ parameters.environment }}
+        env:
+          ARM_CLIENT_ID: $(id)
+          ARM_CLIENT_SECRET: $(secret)
+          TF_IN_AUTOMATION: 'true'
+

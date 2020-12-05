@@ -1,0 +1,6 @@
+.idea/
+.terraform/
+node_modules/
+yarn.*
+*.tfstate*
+*.swp

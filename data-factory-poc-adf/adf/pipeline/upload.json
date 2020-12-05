@@ -1,0 +1,269 @@
+{
+	"name": "upload",
+	"properties": {
+		"activities": [
+			{
+				"name": "Insert Items",
+				"description": "Read from vsc in upload storage container, and insert mapped data to Item table.",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "title",
+									"type": "String"
+								},
+								"sink": {
+									"name": "title"
+								}
+							},
+							{
+								"source": {
+									"name": "description",
+									"type": "String"
+								},
+								"sink": {
+									"name": "description"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "upload_csv",
+						"type": "DatasetReference",
+						"parameters": {
+							"folderPath": {
+								"value": "@pipeline().parameters.folderPath",
+								"type": "Expression"
+							},
+							"fileName": {
+								"value": "@pipeline().parameters.fileName",
+								"type": "Expression"
+							},
+							"container": "upload"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "item",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Delete Upload CSV",
+				"type": "Delete",
+				"dependsOn": [
+					{
+						"activity": "Insert Items",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "upload_csv",
+						"type": "DatasetReference",
+						"parameters": {
+							"folderPath": {
+								"value": "@pipeline().parameters.folderPath",
+								"type": "Expression"
+							},
+							"fileName": {
+								"value": "@pipeline().parameters.fileName",
+								"type": "Expression"
+							},
+							"container": "upload"
+						}
+					},
+					"enableLogging": false,
+					"storeSettings": {
+						"type": "AzureBlobStorageReadSettings",
+						"recursive": true
+					}
+				}
+			},
+			{
+				"name": "Copy Upload to Deadletter",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Insert Items",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "upload_csv",
+						"type": "DatasetReference",
+						"parameters": {
+							"folderPath": {
+								"value": "@pipeline().parameters.folderPath",
+								"type": "Expression"
+							},
+							"fileName": {
+								"value": "@pipeline().parameters.fileName",
+								"type": "Expression"
+							},
+							"container": "upload"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "upload_csv",
+						"type": "DatasetReference",
+						"parameters": {
+							"folderPath": {
+								"value": "@pipeline().parameters.folderPath",
+								"type": "Expression"
+							},
+							"fileName": {
+								"value": "@pipeline().parameters.fileName",
+								"type": "Expression"
+							},
+							"container": "upload-deadletter"
+						}
+					}
+				]
+			},
+			{
+				"name": "Delete Original Upload CSV",
+				"type": "Delete",
+				"dependsOn": [
+					{
+						"activity": "Copy Upload to Deadletter",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "upload_csv",
+						"type": "DatasetReference",
+						"parameters": {
+							"folderPath": {
+								"value": "@pipeline().parameters.folderPath",
+								"type": "Expression"
+							},
+							"fileName": {
+								"value": "@pipeline().parameters.fileName",
+								"type": "Expression"
+							},
+							"container": "upload"
+						}
+					},
+					"enableLogging": false,
+					"storeSettings": {
+						"type": "AzureBlobStorageReadSettings",
+						"recursive": true
+					}
+				}
+			}
+		],
+		"parameters": {
+			"fileName": {
+				"type": "string",
+				"defaultValue": "@triggerBody().fileName"
+			},
+			"folderPath": {
+				"type": "string",
+				"defaultValue": "@triggerBody().folderPath"
+			}
+		},
+		"annotations": []
+	}
+}

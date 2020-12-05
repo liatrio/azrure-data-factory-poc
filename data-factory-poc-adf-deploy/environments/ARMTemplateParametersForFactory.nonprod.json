@@ -1,0 +1,27 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "ldatafactorypocnp"
+		},
+		"key_vault_properties_typeProperties_baseUrl": {
+			"value": "https://ldatafactorypocnp.vault.azure.net/"
+		},
+		"upload_blob_storage_properties_typeProperties_serviceEndpoint": {
+			"value": "https://lsdatafactorypocnp.blob.core.windows.net"
+		},
+		"upload_database_properties_typeProperties_connectionString_secretName": {
+			"value": "connection-string"
+		},
+		"new_upload_properties_upload_parameters_fileName": {
+			"value": "@triggerBody().fileName"
+		},
+		"new_upload_properties_upload_parameters_folderPath": {
+			"value": "@triggerBody().folderPath"
+		},
+		"new_upload_properties_typeProperties_scope": {
+			"value": "/subscriptions/<<TODO: subscription id>>/resourceGroups/data-factory-poc/providers/Microsoft.Storage/storageAccounts/lsdatafactorypocnp"
+		}
+  }
+}

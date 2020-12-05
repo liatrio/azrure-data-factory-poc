@@ -1,0 +1,54 @@
+{
+	"name": "upload_csv",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "upload_blob_storage",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"folderPath": {
+				"type": "string"
+			},
+			"fileName": {
+				"type": "string"
+			},
+			"container": {
+				"type": "string",
+				"defaultValue": "upload"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().fileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@join(skip(split(dataset().folderPath, '/'), 1), '/')",
+					"type": "Expression"
+				},
+				"container": {
+					"value": "@dataset().container",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "title",
+				"type": "String"
+			},
+			{
+				"name": "description",
+				"type": "String"
+			}
+		]
+	}
+}

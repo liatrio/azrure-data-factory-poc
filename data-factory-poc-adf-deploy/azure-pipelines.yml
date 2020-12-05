@@ -1,0 +1,28 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+- deployment: nonprod_arm_template_deploy
+  displayName: Deploy ARM Template to Nonprod
+  environment: Nonprod
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - checkout: self
+        - checkout: git://<<TODO: repo to use for arm templates>>
+        - task: AzureResourceManagerTemplateDeployment@3
+          inputs:
+            deploymentScope: 'Resource Group'
+            azureResourceManagerConnection: 'data-factory-poc-nonprod'
+            subscriptionId: '<<TODO: subscription id>>'
+            action: 'Create Or Update Resource Group'
+            resourceGroupName: 'data-factory-poc'
+            location: 'Central US'
+            templateLocation: 'Linked artifact'
+            csmFile: 'data-factory-poc-adf/ldatafactorypocsa/ARMTemplateForFactory.json'
+            csmParametersFile: 'data-factory-poc-adf-deploy/environments/ARMTemplateParametersForFactory.nonprod.json'
+            deploymentMode: 'Incremental'

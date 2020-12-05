@@ -1,0 +1,57 @@
+parameters:
+  - name: environment
+    type: string
+  - name: next_environment
+    type: string
+    default: "none"
+
+stages:
+  - stage:
+    dependsOn: validate
+    condition: and(succeeded(), eq(variables['Build.SourceBranchName'], '${{ parameters.environment }}'))
+    displayName: ${{ parameters.environment}} Deployment
+    jobs:
+      - deployment: apply
+        displayName: Apply ${{ parameters.environment }}
+        environment: ${{ parameters.environment }}
+        variables:
+          - group: data_factory_poc_spn
+        container: 'liatrio/az-go-tf-tg:0.0.1'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - bash: |
+                    set -euo pipefail
+
+                    git config --global http.https://dev.azure.com.extraHeader "Authorization: bearer $(System.AccessToken)"
+
+                    cd tf/${{ parameters.environment }}
+                    terragrunt apply-all --terragrunt-non-interactive
+                  displayName: Terragrunt Apply ${{ parameters.environment }}
+                  env:
+                    ARM_CLIENT_ID: $(id)
+                    ARM_CLIENT_SECRET: $(secret)
+                    TF_IN_AUTOMATION: 'true'
+
+      - job: create_pr_${{ parameters.next_environment }}
+        displayName: Create PR from ${{ parameters.environment }} to ${{ parameters.next_environment }}
+        dependsOn: apply
+        condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'nonprod')) # set to final environment
+        variables:
+          - group: pr_pat_group
+        container: 'liatrio/az-go-tf-tg:0.0.1'
+        steps:
+          - bash: |
+              az extension add --name azure-devops
+              az repos pr create \
+                --org $(ado_org) \
+                -p $(ado_project) \
+                -r $(ado_repo) \
+                --source-branch ${{ parameters.environment }} \
+                --target-branch ${{ parameters.next_environment }} \
+                --title "Automated Promotion PR: ${{ parameters.environment }} to ${{ parameters.next_environment }}"
+            env:
+              AZURE_DEVOPS_EXT_PAT: $(pat)
+

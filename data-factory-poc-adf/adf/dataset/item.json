@@ -1,0 +1,29 @@
+{
+	"name": "item",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "upload_database",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "uniqueidentifier"
+			},
+			{
+				"name": "title",
+				"type": "text"
+			},
+			{
+				"name": "description",
+				"type": "text"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "item"
+		}
+	}
+}
