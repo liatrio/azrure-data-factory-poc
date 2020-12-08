@@ -1,7 +1,7 @@
-# Data Factory Automation Example - Liatrio POC2
+# Data Factory Automation Example
 
-This repository contains all of the code that was used for POC2. There are for repositories and each repository has been stored in this repository as
-a directory. 
+This repository contains all of the code that was used for a proof of concept done by Liatrio. There are for repositories and each repository has
+been stored in this repository as a directory. 
 
 ## Repositories
 
@@ -37,11 +37,3 @@ publish feature to get the remainder of the arm templates needed for this to wor
 This directory contains the automation and scripts that support the promotion of Data Factory Arm Templates. This repository can be set up with
 environment based branches. Both Deployment jobs in yaml and classic Release Pipelines will benefit from this information.
 
-## Contributors
-
-Eric Chapman, Principal DevOps Engineer  
-Ryan Vance, Sr. DevOps Engineer  
-[Justin Bankes](https://github.com/jbankes), Sr. DevOps Engineer  
-Michael Parker, Sr. DevOps Engineer  
-
-[Liatrio](https://www.liatrio.com)
